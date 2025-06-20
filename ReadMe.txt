@@ -75,4 +75,9 @@ C:\images\B	3枚	[ 3 ]	🔄 取り消し
 言語	Python 3.10+
 GUI	tkinter（シンプル）または PyQt6（拡張性あり）
 処理	os, shutil, glob, random
-ログ	テキスト + UI表示（+ファイル出力もオプション）
+## 使用方法
+Python 3.10 以上で `image_shuffler.py` を実行してください:
+
+```bash
+python image_shuffler.py
+```
