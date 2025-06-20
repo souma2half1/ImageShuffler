@@ -11,10 +11,8 @@ import os
 import random
 import shutil
 from glob import glob
-from tkinter import (
-    Tk, Frame, Label, Button, Entry, filedialog, StringVar,
-    IntVar, Radiobutton, Scrollbar, Text, ttk, END, DISABLED, NORMAL
-)
+import tkinter as tk
+from tkinter import filedialog, ttk
 
 IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.webp'}
 
@@ -30,26 +28,26 @@ def list_images(directory: str) -> list[str]:
 
 
 class SourceRow:
-    def __init__(self, master: Frame, path: str, remove_callback):
+    def __init__(self, master: ttk.Frame, path: str, remove_callback):
         self.master = master
         self.path = path
         self.remove_callback = remove_callback
         images = list_images(path)
         self.available = len(images)
 
-        self.path_label = Label(master, text=path)
-        self.count_label = Label(master, text=str(self.available))
-        self.amount_var = IntVar(value=self.available)
-        self.amount_entry = Entry(master, width=5, textvariable=self.amount_var)
-        self.remove_btn = Button(
+        self.path_label = ttk.Label(master, text=path)
+        self.count_label = ttk.Label(master, text=str(self.available))
+        self.amount_var = tk.IntVar(value=self.available)
+        self.amount_entry = ttk.Entry(master, width=5, textvariable=self.amount_var)
+        self.remove_btn = ttk.Button(
             master, text="取り消し", command=self.remove
         )
 
     def grid(self, row: int):
-        self.path_label.grid(row=row, column=0, sticky='w')
-        self.count_label.grid(row=row, column=1)
-        self.amount_entry.grid(row=row, column=2)
-        self.remove_btn.grid(row=row, column=3)
+        self.path_label.grid(row=row, column=0, sticky='w', padx=2, pady=2)
+        self.count_label.grid(row=row, column=1, padx=2, pady=2)
+        self.amount_entry.grid(row=row, column=2, padx=2, pady=2)
+        self.remove_btn.grid(row=row, column=3, padx=2, pady=2)
 
     def remove(self):
         self.path_label.destroy()
@@ -67,39 +65,43 @@ class SourceRow:
 
 
 class ImageShufflerGUI:
-    def __init__(self, root: Tk):
+    def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("ImageShuffler")
 
-        self.sources_frame = Frame(root)
+        self.sources_frame = ttk.Frame(root)
         self.sources_frame.pack(fill='x', padx=5, pady=5)
 
         headers = ['フォルダパス', '移動可能枚数', '移動枚数', '取り消し']
         for i, h in enumerate(headers):
-            Label(self.sources_frame, text=h, font=('Arial', 10, 'bold')).grid(row=0, column=i)
+            ttk.Label(
+                self.sources_frame,
+                text=h,
+                font=("Arial", 10, "bold")
+            ).grid(row=0, column=i, padx=2, pady=2)
 
         self.rows: list[SourceRow] = []
 
-        ops = Frame(root)
+        ops = ttk.Frame(root)
         ops.pack(fill='x', padx=5, pady=5)
 
-        Button(ops, text="対象フォルダを追加", command=self.add_folder).grid(row=0, column=0, padx=5)
-        Button(ops, text="移動先フォルダを選択", command=self.select_dest).grid(row=0, column=1, padx=5)
+        ttk.Button(ops, text="対象フォルダを追加", command=self.add_folder).grid(row=0, column=0, padx=5)
+        ttk.Button(ops, text="移動先フォルダを選択", command=self.select_dest).grid(row=0, column=1, padx=5)
 
-        self.order_var = StringVar(value='name')
-        Radiobutton(ops, text="ファイル名順", variable=self.order_var, value='name').grid(row=1, column=0)
-        Radiobutton(ops, text="ランダム", variable=self.order_var, value='random').grid(row=1, column=1)
+        self.order_var = tk.StringVar(value='name')
+        ttk.Radiobutton(ops, text="ファイル名順", variable=self.order_var, value='name').grid(row=1, column=0)
+        ttk.Radiobutton(ops, text="ランダム", variable=self.order_var, value='random').grid(row=1, column=1)
 
-        Button(ops, text="実行", command=self.execute).grid(row=2, column=0, pady=5)
+        ttk.Button(ops, text="実行", command=self.execute).grid(row=2, column=0, pady=5)
 
-        self.total_label = Label(root, text="合計移動枚数: 0")
+        self.total_label = ttk.Label(root, text="合計移動枚数: 0")
         self.total_label.pack(anchor='w', padx=5)
 
-        log_frame = Frame(root)
+        log_frame = ttk.Frame(root)
         log_frame.pack(fill='both', expand=True, padx=5, pady=5)
-        self.log_text = Text(log_frame, height=10)
+        self.log_text = tk.Text(log_frame, height=10)
         self.log_text.pack(side='left', fill='both', expand=True)
-        scrollbar = Scrollbar(log_frame, command=self.log_text.yview)
+        scrollbar = ttk.Scrollbar(log_frame, command=self.log_text.yview)
         scrollbar.pack(side='right', fill='y')
         self.log_text.config(yscrollcommand=scrollbar.set)
 
@@ -173,14 +175,14 @@ class ImageShufflerGUI:
         self.total_label.config(text=f"合計移動枚数: {total}")
 
     def log(self, message: str):
-        self.log_text.configure(state=NORMAL)
-        self.log_text.insert(END, message + "\n")
-        self.log_text.configure(state=DISABLED)
-        self.log_text.see(END)
+        self.log_text.configure(state=tk.NORMAL)
+        self.log_text.insert(tk.END, message + "\n")
+        self.log_text.configure(state=tk.DISABLED)
+        self.log_text.see(tk.END)
 
 
 def main():
-    root = Tk()
+    root = tk.Tk()
     gui = ImageShufflerGUI(root)
     root.mainloop()
 
